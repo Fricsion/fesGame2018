@@ -44,6 +44,18 @@ class Player(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
     
+class Enemy:
+    def __init__(self, filename, width, height, x, y):
+        super().__init__(self)
+        self.enemy = load_image(filename, width, height)
+        self.rect = Rect(x, y, width, height)
+
+    def draw(self, screen):
+        screen.blit(self.enemy, self.rect)
+        
+
+
+        
 #class Barrage(pygame.sprite.Sprite):
 #    def __init__(self, filename, x, y, vx, vy, width, height):
 #        # デフォルトグループをセット
