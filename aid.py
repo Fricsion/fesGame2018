@@ -12,6 +12,15 @@ def load_image(filename, width, height):
     image = pygame.transform.scale(image, (width, height))
     return image
 
+def collisionOfbullet(player, bars):    # 敵弾と自機の当たり判定（動作に問題あり）
+        bar_collision = pygame.sprite.spritecollide(player, bars, True, pygame.sprite.collide_circle)
+        if bar_collision:
+            player.kill()
+
+def collisionOfButton(player, button):
+    return None
+
+ 
 class Player(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -89,12 +98,40 @@ class Barrage(pygame.sprite.Sprite):
             self.rect = self.rect.clamp(SCR_RECT)
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, filename, width, height, x, y):
+    def __init__(self, filename, width, height, x, y, command):
         self.button = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
+        self.command = command
 
     def draw(self, screen):
         screen.blit(self.button, self.rect)
+
+def startScr():
+    #-- Here Initialize
+    
+    while True:
+        #-- Here Loop
+        break
+
+    return None
+
+def gameScr():
+    #-- Here Initialize
+
+    while True:
+        #-- Here Loop
+        break
+
+    return None
+
+def overScr():
+     #-- Here Initialize
+   
+    while True:
+        #-- Here Loop
+        break
+        
+    return None
 
 def main():
     pygame.init()
@@ -107,6 +144,8 @@ def main():
     player = Player("images/heart.png", 20, 20, 320, 280)
 
     enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
+
+    start_button = Button("images/earth.png", 70, 20, 10, 10, 0)
 
     bullet_list = [0, 0, 1, 1]
     
@@ -122,8 +161,6 @@ def main():
         clock.tick(60)  # 60fps
         screen.fill((0,0,0))
 
-
-
         #プレイヤー移動＆描画
         player.move()
         player.draw(screen)
@@ -136,17 +173,12 @@ def main():
         bars.draw(screen)
 
         #当たり判定
-        bar_collision = pygame.sprite.spritecollide(player, bars, True, pygame.sprite.collide_circle)
-        if bar_collision:
-            player.kill()
-           
-
+        collisionOfbullet(player, bars)
 
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == QUIT:
                 sys.exit()
-
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     pygame.quit()
