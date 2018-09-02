@@ -11,20 +11,9 @@ screen = pygame.display.set_mode(SCR_RECT.size)
 pygame.display.set_caption(u"Undertale")
 
 def load_image(filename, width, height):
-    image = pygame.image.load(filename).convert_alpha()
-    image = pygame.transform.scale(image, (width, height))
-    return image
-
-def collisionOfbullet(player, bars):    # 敵弾と自機の当たり判定（動作に問題あり）
-        bar_collision = pygame.sprite.spritecollide(player, bars, True, pygame.sprite.collide_circle)
-        if bar_collision:
-            player_health = player_health - 1
-            if player_health <= 0:
-                overScr()
-
-def collisionOfButton(player, button):
-    return None
-
+   image = pygame.image.load(filename).convert_alpha()
+   image = pygame.transform.scale(image, (width, height))
+   return image
  
 class Player(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y):
@@ -117,14 +106,14 @@ class Undertale:
         self.game_status = 0
         self.clock = pygame.time.Clock()
         self.player = Player("images/heart.png", 20, 20, 320, 200)
-        startScr()
-        main_loop()
+        self.startScr()
+        self.main_loop()
 
     def main_loop(self):
         while True:
-            pygame.display.update()
             clock.tick(60)  # 60fps
             screen.fill((0,0,0))
+            pygame.display.update()
             for event in pygame.event.get():
                 if event.type == QUIT:
                     sys.exit()
@@ -134,9 +123,21 @@ class Undertale:
                         sys.exit()
 
 
+   
+    def collisionOfbullet(self, player, bars):    # 敵弾と自機の当たり判定（動作に問題あり）
+            bar_collision = pygame.sprite.spritecollide(player, bars, True, pygame.sprite.collide_circle)
+            if bar_collision:
+                self.player_health = self.player_health - 1
+                if self.player_health <= 0:
+                    overScr()
+
+    def collisionOfButton(self, player, button):
+        return None
+
+
     def startScr(self):
         self.player_health = 3
-        gameScr()
+        self.gameScr()
 
     def gameScr(self):
     
@@ -159,8 +160,8 @@ class Undertale:
             screen.fill((0,0,0))
     
             #プレイヤー移動＆描画
-            player.move()
-            player.draw(screen)
+            self.player.move()
+            self.player.draw(screen)
     
             
             enemy.draw(screen)
@@ -170,7 +171,7 @@ class Undertale:
             bars.draw(screen)
     
             #当たり判定
-            collisionOfbullet(player, bars)
+            self.collisionOfbullet(self.player, bars)
 
 
         
