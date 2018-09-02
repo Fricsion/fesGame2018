@@ -10,10 +10,14 @@ pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
 pygame.display.set_caption(u"Undertale")
 
-
 class Undertale:
     def __init__(self):
+        self.game_status = 0
 
+    def main_loop(self):
+        clock = pygame.time.Clock()
+        while True:
+            pygame.display.update()
 
 
 
