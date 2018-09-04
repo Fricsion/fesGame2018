@@ -9,6 +9,7 @@ SCR_RECT = Rect(0, 0, 640, 480)
 pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
 pygame.display.set_caption(u"Undertale")
+TITLE, PLAY, GAMEOVER = (0, 1, 2)
 
 def load_image(filename, width, height):
    image = pygame.image.load(filename).convert_alpha()
@@ -103,78 +104,70 @@ class Button(pygame.sprite.Sprite):
 
 class Undertale:
     def __init__(self):
-        self.game_status = 0
-        self.clock = pygame.time.Clock()
-        self.player = Player("images/heart.png", 20, 20, 320, 200)
-        self.startScr()
-        self.main_loop()
-
-    def main_loop(self):
-        while True:
-            clock.tick(60)  # 60fps
-            screen.fill((0,0,0))
-            pygame.display.update()
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    sys.exit()
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        pygame.quit()
-                        sys.exit()
-
-
-   
-    def collisionOfbullet(self, player, bars):    # 敵弾と自機の当たり判定（動作に問題あり）
-            bar_collision = pygame.sprite.spritecollide(player, bars, True, pygame.sprite.collide_circle)
-            if bar_collision:
-                self.player_health = self.player_health - 1
-                if self.player_health <= 0:
-                    overScr()
-
-    def collisionOfButton(self, player, button):
-        return None
-
-
-    def startScr(self):
-        self.player_health = 3
-        self.gameScr()
-
-    def gameScr(self):
-    
-        enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
-    
-        start_button = Button("images/earth.png", 70, 20, 10, 10, 0)
-    
-        bullet_list = [0, 0, 1, 1]
-        
-        # スプライトグループを作成してスプライトクラスに割り当て
-        bars = pygame.sprite.RenderUpdates()
-        Barrage.containers = bars 
-        for type in bullet_list:
-            new = Barrage("images/asteroid1.png", enemy.x, enemy.y, 5, 5, 30, 30, type)
+        self.game_status = TITLE
         
         clock = pygame.time.Clock()
-        
+
         while True:
-            clock.tick(60)  # 60fps
-            screen.fill((0,0,0))
-    
-            #プレイヤー移動＆描画
-            self.player.move()
-            self.player.draw(screen)
-    
+            clock.tick(60)
+            screen.fill((0, 0, 0))
             
-            enemy.draw(screen)
-    
-            # スプライトグループを更新＆描画
+            self.update()
+            self.draw(screen)
+
+            pygame.display.update()
+
+            self.key_handler()
+
+    def game_init(self):
+
+        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
+
+        bullet_list = [0, 0, 1, 1]
+
+        bars = pygame.sprite.RenderUpdates()
+        Barrage.containers = bars
+        for type in bullet_list:
+            new = Barrage("images/asteroid1.png", enemy.x, enemy.y, 5, 5, 30, 30, type)
+
+    def update(self):
+        if self.game_status == TITLE:
+            return None
+
+        elif self.game_status == PLAY:
             bars.update()
+            return None
+
+        elif self.game_status == GAMEOVER:
+            return None
+
+
+    def draw(self, screen):
+        if self.game_status == TITLE:
+            return None
+
+        if self.game_status == PLAY:
             bars.draw(screen)
-    
-            #当たり判定
-            self.collisionOfbullet(self.player, bars)
+            return None
 
+        if self.game_status == GAMEOVER:
+            return None
 
-        
+    def key_handler(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                
+                elif event.key == K_z:
+                    if self.game_status == OVER:
+                        self.game_status == TITLE
+
 
 if __name__ == "__main__":
     Undertale()
