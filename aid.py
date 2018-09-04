@@ -106,33 +106,6 @@ class Button(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.button, self.rect)
 
-def startScr():
-    #-- Here Initialize
-    
-    while True:
-        #-- Here Loop
-        break
-
-    return None
-
-def gameScr():
-    #-- Here Initialize
-
-    while True:
-        #-- Here Loop
-        break
-
-    return None
-
-def overScr():
-     #-- Here Initialize
-   
-    while True:
-        #-- Here Loop
-        break
-        
-    return None
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode(SCR_RECT.size)
