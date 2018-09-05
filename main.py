@@ -46,6 +46,7 @@ class Player(pygame.sprite.Sprite):
                 self.rect.move_ip(0, -self.speed)
             if pressed_key[K_DOWN]:
                 self.rect.move_ip(0, self.speed)
+        self.rect = self.rect.clamp(SCR_RECT)
 
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
