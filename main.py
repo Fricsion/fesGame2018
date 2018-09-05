@@ -94,21 +94,19 @@ class Barrage(pygame.sprite.Sprite):
 class Button(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y, command):
         self.button = load_image(filename, width, height)
-        sdelf.rect = Rect(x, y, width, height)
+        self.rect = Rect(x, y, width, height)
         self.command = command
 
     def draw(self, screen):
         screen.blit(self.button, self.rect)
 
-def main():
 
-<<<<<<< HEAD
 class Undertale:
     def __init__(self):
         self.game_status = TITLE 
         self.game_init()
         
-        self.player = Player("images/heart.png", self.player_health*10, self.player_health*10, 320, 200)
+        self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 200)
 
         self.start_button = Button("images/button_mercy.png", 100, 40, 10, 10, 0)
         clock = pygame.time.Clock()
@@ -126,7 +124,8 @@ class Undertale:
 
     def game_init(self):
 
-        self.player_health = 3
+        self.player_health = 2
+        self.player_scale = [10, 15, 20]
 
         self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
 
@@ -173,7 +172,7 @@ class Undertale:
         bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
             self.player_health = self.player_health - 1
-            self.player.combat = pygame.transform.scale(self.player.combat, (self.player_health*10, self.player_health*10))
+            self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
             if self.player_health < 0:
                 self.game_status == GAMEOVER
 
@@ -203,24 +202,3 @@ class Undertale:
 
 if __name__ == "__main__":
     Undertale()
-=======
-
-    clock = pygame.time.Clock()
-
-    while True:
-        clock.tick(60)
-        screen.fill((0, 0, 0))
-
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                sys.exit()
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-
-
-if __name__ == "__main__":
-    main()
->>>>>>> 2b22126005da4bd916483a703bf5befa43e270e3
