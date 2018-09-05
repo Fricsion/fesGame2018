@@ -106,9 +106,9 @@ class Undertale:
         self.game_status = TITLE 
         self.game_init()
         
-        self.player = Player("images/heart.png", 15, 15, 320, 200)
+        self.player = Player("images/heart.png", self.player_health*10, self.player_health*10, 320, 200)
 
-        self.start_button = Button("images/button_mercy.png", 70, 20, 10, 10, 0)
+        self.start_button = Button("images/button_mercy.png", 100, 40, 10, 10, 0)
         clock = pygame.time.Clock()
 
         while True:
@@ -123,6 +123,8 @@ class Undertale:
             self.key_handler()
 
     def game_init(self):
+
+        self.player_health = 3
 
         self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
 
@@ -168,7 +170,10 @@ class Undertale:
     def collisionOfBullet(self):
         bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
-            self.player.kill()
+            self.player_health = self.player_health - 1
+            self.player.combat = pygame.transform.scale(self.player.combat, (self.player_health*10, self.player_health*10))
+            if self.player_health < 0:
+                self.game_status == GAMEOVER
 
     def collisionOfButton(self, button):
         button_col = pygame.sprite.collide_rect(self.player, button)
