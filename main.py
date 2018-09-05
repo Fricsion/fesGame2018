@@ -103,10 +103,12 @@ class Button(pygame.sprite.Sprite):
 
 class Undertale:
     def __init__(self):
-        self.game_status = PLAY 
+        self.game_status = TITLE 
         self.game_init()
         
         self.player = Player("images/heart.png", 15, 15, 320, 200)
+
+        self.start_button = Button("images/button_mercy.png", 70, 20, 10, 10, 0)
         clock = pygame.time.Clock()
 
         while True:
@@ -139,6 +141,7 @@ class Undertale:
         elif self.game_status == PLAY:
             self.player.move()
             self.bars.update()
+            self.collisionOfBullet()
             return None
 
         elif self.game_status == GAMEOVER:
@@ -148,6 +151,7 @@ class Undertale:
     def draw(self, screen):
         if self.game_status == TITLE:
             screen.fill((0, 0, 0))
+            self.start_button.draw(screen)
             self.player.draw(screen)
             return None
 
@@ -161,6 +165,17 @@ class Undertale:
         if self.game_status == GAMEOVER:
             return None
 
+    def collisionOfBullet(self):
+        bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
+        if bullet_col:
+            self.player.kill()
+
+    def collisionOfButton(self, button):
+        button_col = pygame.sprite.collide_rect(self.player, button)
+        if button_col:
+            self.game_status = PLAY
+
+
     def key_handler(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -172,10 +187,12 @@ class Undertale:
                     pygame.quit()
                     sys.exit()
                 
-                if self.game_status == GAMEOVER:
+                if self.game_status == TITLE:
+                    if event.key == K_z:
+                        self.collisionOfButton(self.start_button)
+                elif self.game_status == GAMEOVER:
                     if event.key == K_z:
                         self.game_status = TITLE
 
 if __name__ == "__main__":
     Undertale()
-
