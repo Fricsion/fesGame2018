@@ -94,13 +94,15 @@ class Barrage(pygame.sprite.Sprite):
 class Button(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y, command):
         self.button = load_image(filename, width, height)
-        self.rect = Rect(x, y, width, height)
+        sdelf.rect = Rect(x, y, width, height)
         self.command = command
 
     def draw(self, screen):
         screen.blit(self.button, self.rect)
 
+def main():
 
+<<<<<<< HEAD
 class Undertale:
     def __init__(self):
         self.game_status = TITLE 
@@ -201,3 +203,24 @@ class Undertale:
 
 if __name__ == "__main__":
     Undertale()
+=======
+
+    clock = pygame.time.Clock()
+
+    while True:
+        clock.tick(60)
+        screen.fill((0, 0, 0))
+
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+
+
+if __name__ == "__main__":
+    main()
+>>>>>>> 2b22126005da4bd916483a703bf5befa43e270e3
