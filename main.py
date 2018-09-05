@@ -22,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.combat = load_image(filename, width, height)
         width = self.combat.get_width()
         height = self.combat.get_height()
+        self.speed = 5
         self.rect = Rect(x, y, width, height)
         self.radius = width/3 # 円の当たり判定で使うゾ
 
@@ -29,22 +30,22 @@ class Player(pygame.sprite.Sprite):
         pressed_key = pygame.key.get_pressed()
         if pressed_key[K_LSHIFT]:
             if pressed_key[K_LEFT]:
-                self.rect.move_ip(-2, 0)
+                self.rect.move_ip(-self.speed/2, 0)
             if pressed_key[K_RIGHT]:
-                self.rect.move_ip(2, 0)
+                self.rect.move_ip(self.speed/2, 0)
             if pressed_key[K_UP]:
-                self.rect.move_ip(0, -2)
+                self.rect.move_ip(0, -self.speed/2)
             if pressed_key[K_DOWN]:
-                self.rect.move_ip(0, 2)
+                self.rect.move_ip(0, self.speed/2)
         else:
             if pressed_key[K_LEFT]:
-                self.rect.move_ip(-5, 0)
+                self.rect.move_ip(-self.speed, 0)
             if pressed_key[K_RIGHT]:
-                self.rect.move_ip(5, 0)
+                self.rect.move_ip(self.speed, 0)
             if pressed_key[K_UP]:
-                self.rect.move_ip(0, -5)
+                self.rect.move_ip(0, -self.speed)
             if pressed_key[K_DOWN]:
-                self.rect.move_ip(0, 5)
+                self.rect.move_ip(0, self.speed)
 
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
@@ -58,10 +59,7 @@ class Enemy:
 
     def draw(self, screen):
         screen.blit(self.enemy, self.rect)
-        
 
-
-        
 class Barrage(pygame.sprite.Sprite):
     def __init__(self, filename, x, y, vx, vy, width, height, type):
         # デフォルトグループをセット
@@ -104,13 +102,15 @@ class Button(pygame.sprite.Sprite):
 
 class Undertale:
     def __init__(self):
-        self.game_status = TITLE
+        self.game_status = PLAY 
+        self.game_init()
         
+        self.player = Player("images/heart.png", 15, 15, 320, 200)
         clock = pygame.time.Clock()
 
         while True:
             clock.tick(60)
-            screen.fill((0, 0, 0))
+
             
             self.update()
             self.draw(screen)
@@ -125,17 +125,19 @@ class Undertale:
 
         bullet_list = [0, 0, 1, 1]
 
-        bars = pygame.sprite.RenderUpdates()
-        Barrage.containers = bars
+        self.bars = pygame.sprite.RenderUpdates()
+        Barrage.containers = self.bars
         for type in bullet_list:
-            new = Barrage("images/asteroid1.png", enemy.x, enemy.y, 5, 5, 30, 30, type)
+            new = Barrage("images/asteroid1.png", self.enemy.x, self.enemy.y, 5, 5, 30, 30, type)
 
     def update(self):
         if self.game_status == TITLE:
+            self.player.move()
             return None
 
         elif self.game_status == PLAY:
-            bars.update()
+            self.player.move()
+            self.bars.update()
             return None
 
         elif self.game_status == GAMEOVER:
@@ -144,10 +146,15 @@ class Undertale:
 
     def draw(self, screen):
         if self.game_status == TITLE:
+            screen.fill((0, 0, 0))
+            self.player.draw(screen)
             return None
 
         if self.game_status == PLAY:
-            bars.draw(screen)
+            screen.fill((0, 0, 0))
+            self.enemy.draw(screen)
+            self.bars.draw(screen)
+            self.player.draw(screen)
             return None
 
         if self.game_status == GAMEOVER:
@@ -164,10 +171,9 @@ class Undertale:
                     pygame.quit()
                     sys.exit()
                 
-                elif event.key == K_z:
-                    if self.game_status == OVER:
-                        self.game_status == TITLE
-
+                if self.game_status == GAMEOVER:
+                    if event.key == K_z:
+                        self.game_status = TITLE
 
 if __name__ == "__main__":
     Undertale()
