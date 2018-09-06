@@ -5,9 +5,12 @@ from pygame.locals import *
 import sys
 import random
 
-SCR_RECT = Rect(0, 0, 640, 480)
+SCR_RECT = Rect(0, 0, 640, 360) 
 pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
+#screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
+sysfont = pygame.font.SysFont(None, 80)
+
 pygame.display.set_caption(u"Undertale")
 TITLE, PLAY, GAMEOVER = (0, 1, 2)
 START, FIGHT = (0, 1)
@@ -93,10 +96,9 @@ class Barrage(pygame.sprite.Sprite):
             self.rect = self.rect.clamp(SCR_RECT)
 
 class Button(pygame.sprite.Sprite):
-    def __init__(self, filename, width, height, x, y, command):
+    def __init__(self, filename, width, height, x, y):
         self.button = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
-        self.command = command
 
     def draw(self, screen):
         screen.blit(self.button, self.rect)
@@ -108,14 +110,14 @@ class Undertale:
         self.game_status = TITLE 
         self.game_init()
         
-        self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 200)
+        self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
 
-        self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200, 0)
-        self.start_button = Button("images/button_mercy.png", 100, 40, 10, 10, 0)
-        clock = pygame.time.Clock()
+        self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200)
+        self.start_button = Button("images/button_mercy.png", 100, 50, 320, 180)
+        self.clock = pygame.time.Clock()
 
         while True:
-            clock.tick(60)
+            self.clock.tick(60)
 
             
             self.update()
@@ -132,7 +134,7 @@ class Undertale:
 
         self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
 
-        bullet_list = [0, 0, 1, 1]
+        bullet_list = [0, 0, 1, 1, 1]
 
         self.bars = pygame.sprite.RenderUpdates()
         Barrage.containers = self.bars
@@ -170,6 +172,7 @@ class Undertale:
             return None
 
         if self.game_status == GAMEOVER:
+            screen.fill((100, 100, 100))
             return None
 
     def collisionOfBullet(self):
@@ -178,7 +181,7 @@ class Undertale:
             self.player_health = self.player_health - 1
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
             if self.player_health < 0:
-                self.game_status == GAMEOVER
+                self.game_status = GAMEOVER
 
     def collisionOfButton(self, button, act):
         button_col = pygame.sprite.collide_rect(self.player, button)
