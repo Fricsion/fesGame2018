@@ -10,6 +10,7 @@ pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
 pygame.display.set_caption(u"Undertale")
 TITLE, PLAY, GAMEOVER = (0, 1, 2)
+START, FIGHT = (0, 1)
 
 def load_image(filename, width, height):
    image = pygame.image.load(filename).convert_alpha()
@@ -101,6 +102,7 @@ class Button(pygame.sprite.Sprite):
         screen.blit(self.button, self.rect)
 
 
+
 class Undertale:
     def __init__(self):
         self.game_status = TITLE 
@@ -108,6 +110,7 @@ class Undertale:
         
         self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 200)
 
+        self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200, 0)
         self.start_button = Button("images/button_mercy.png", 100, 40, 10, 10, 0)
         clock = pygame.time.Clock()
 
@@ -160,6 +163,7 @@ class Undertale:
 
         if self.game_status == PLAY:
             screen.fill((0, 0, 0))
+            self.fight_button.draw(screen)
             self.enemy.draw(screen)
             self.bars.draw(screen)
             self.player.draw(screen)
@@ -176,10 +180,13 @@ class Undertale:
             if self.player_health < 0:
                 self.game_status == GAMEOVER
 
-    def collisionOfButton(self, button):
+    def collisionOfButton(self, button, act):
         button_col = pygame.sprite.collide_rect(self.player, button)
         if button_col:
-            self.game_status = PLAY
+            if act == START:
+                self.game_status = PLAY
+            if act == FIGHT:
+                print("True")
 
 
     def key_handler(self):
@@ -195,10 +202,14 @@ class Undertale:
                 
                 if self.game_status == TITLE:
                     if event.key == K_z:
-                        self.collisionOfButton(self.start_button)
+                        self.collisionOfButton(self.start_button, START)
+
+                elif self.game_status == PLAY:
+                    if event.key == K_z:
+                        self.collisionOfButton(self.fight_button, FIGHT)
                 elif self.game_status == GAMEOVER:
                     if event.key == K_z:
                         self.game_status = TITLE
 
 if __name__ == "__main__":
-    Undertale()
+    myGame = Undertale()
