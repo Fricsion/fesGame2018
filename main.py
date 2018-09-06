@@ -59,6 +59,7 @@ class Enemy:
     def __init__(self, filename, width, height, x, y):
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
+        self.health = 14
         self.x = x
         self.y = y
 
@@ -71,8 +72,8 @@ class Barrage(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
-        self.vx = random.randint(1, 10)
-        self.vy = random.randint(1, 10)
+        self.vx = random.randint(1, 2)
+        self.vy = random.randint(1, 2)
         self.type = type
         self.radius = width/3   # 円の当たり判定で使うゾ
     
@@ -110,8 +111,6 @@ class Undertale:
         self.game_status = TITLE 
         self.game_init()
         
-        self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
-
         self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200)
         self.start_button = Button("images/button_mercy.png", 100, 50, 320, 180)
         self.clock = pygame.time.Clock()
@@ -131,6 +130,8 @@ class Undertale:
 
         self.player_health = 2
         self.player_scale = [10, 15, 20]
+        self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
+
 
         self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
 
@@ -178,7 +179,7 @@ class Undertale:
     def collisionOfBullet(self):
         bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
-            self.player_health = self.player_health - 1
+            self.player_health -= 1 
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
             if self.player_health < 0:
                 self.game_status = GAMEOVER
@@ -189,8 +190,7 @@ class Undertale:
             if act == START:
                 self.game_status = PLAY
             if act == FIGHT:
-                print("True")
-
+                self.enemy.health -= 1
 
     def key_handler(self):
         for event in pygame.event.get():
@@ -212,7 +212,8 @@ class Undertale:
                         self.collisionOfButton(self.fight_button, FIGHT)
                 elif self.game_status == GAMEOVER:
                     if event.key == K_z:
-                        self.game_status = TITLE
+                        self.game_status = TITLE 
+                        self.game_init()
 
 if __name__ == "__main__":
     myGame = Undertale()
