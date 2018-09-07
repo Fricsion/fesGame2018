@@ -62,7 +62,7 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.combat, self.rect)
     
 class Enemy:
-    shot_prob = 10 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
+    shot_prob = 100 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
     def __init__(self, filename, width, height, x, y, max_health, type):
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
@@ -131,11 +131,10 @@ class Barrage(pygame.sprite.Sprite):
             self.rect = self.rect.clamp(SCR_RECT)
 
         elif self.type == 2:    # type_2: 頂点を出発点、ランダムな傾きを加えた二次関数、式は上に凸だが実際は下に凸として描画される。また左右もランダム
-            a = random.randint(1, 100)
-            self.vy = a * (self.vx - self.x)^2 + self.y
-            self.rect.move_ip(self.vx, self.vy)
-
-
+            for x in range(100):
+                y = (x - self.x)^2 + self.y
+                self.rect.move_ip(x-self.rect.x, y-self.rect.y)
+            
 class Button(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -175,6 +174,9 @@ class Underheart:
 
         self.hit_sound = pygame.mixer.Sound("sounds/bad.wav")
         self.break_sound = pygame.mixer.Sound("sounds/break.wav")
+        self.select_sound = pygame.mixer.Sound("sounds/select.wav")
+        self.enter_sound = pygame.mixer.Sound("sounds/enter.wav")
+        self.attack_sound = pygame.mixer.Sound("sounds/attack.wav")
 
 #        foo = load_image("healthy_heart.png", 10, 10)
 #        bar = load_image("broken_heart.png", 10, 10)
@@ -257,7 +259,6 @@ class Underheart:
 
         elif self.game_status == PLAY:
             screen.fill((0, 0, 0))
-#            screen.blit(sysfont.render("Now frame is equal"+str(self.frame), False, (255, 255, 255)), (0, 0))
             self.fight_button.draw(screen)
             self.enemy.draw(screen)
             pygame.draw.line(screen, (255, 255, 255), (self.enemy.x, self.enemy.y+10), (self.enemy.x + self.enemy.health * 5, self.enemy.y+10), 5)
@@ -267,6 +268,9 @@ class Underheart:
 
         elif self.game_status == CLEAR:
             screen.fill((200, 200, 200))
+            screen.blit(sysfont.render("Now frame is equal"+str(self.frame), False, (255, 255, 255)), (0, 0))
+            screen.blit(sysfont.render("Press Z to back to menu", False, (255, 255, 255)), (100, 100))
+
             return None
 
         elif self.game_status == GAMEOVER:
@@ -296,6 +300,7 @@ class Underheart:
         button_col = pygame.sprite.collide_rect(self.player, button)
         if button_col:
             if act == FLAG:
+                self.select_sound.play()
                 if flag == 1:
                     self.stage_flag = 1
 
@@ -305,8 +310,10 @@ class Underheart:
                 self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 30, self.stage_flag)
 
             if act == START:
+                self.enter_sound.play()
                 self.game_status = PLAY
             if act == FIGHT:
+                self.attack_sound.play()
                 self.enemy.health -= 1
                 self.fight_button.update()
                         
@@ -335,6 +342,7 @@ class Underheart:
                 elif self.game_status == GAMEOVER or self.game_status == CLEAR:
                     if event.key == K_z:
                         self.bars.empty()
+                        self.enemy.kill()
                         self.game_status = TITLE 
                         self.game_init()
 
