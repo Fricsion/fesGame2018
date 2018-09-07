@@ -75,12 +75,9 @@ class Enemy:
         if self.rect.y <= 30:
             self.rect.move_ip(0, 1)
 
-#        shot_orNot = random.randrange(300)
-#        if shot_orNot == 1:
-#            new = Barrage("images/asteroid1.png", self.x, self.y, 30, 30, 5, 5, 1)
         if self.type == 1:
             if not random.randrange(self.shot_prob):
-                new = Barrage("images/asteroid1.png", self.x, self.y, 30, 30, 15, 15, 1, [5])
+                new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
 
         if self.type == 2:
             if not random.randrange(self.shot_prob):
@@ -89,6 +86,8 @@ class Enemy:
 
     def draw(self, screen):
         screen.blit(self.enemy, self.rect)
+        
+        pygame.draw.line(screen, (90, 140, 40), (self.rect.x, self.rect.y-10), (self.rect.x + self.health * 15, self.rect.y-10), 5)
 
 class Barrage(pygame.sprite.Sprite):
     def __init__(self, filename, x, y, vx, vy, width, height, type, option = None):
@@ -118,12 +117,9 @@ class Barrage(pygame.sprite.Sprite):
             if self.rect.left < 0 or self.rect.right > SCR_RECT.width:
                 self.vx = -self.vx
                 self.bounce_counter += 1
-                print(self.bounce_counter)
-
             if self.rect.top < 0 or self.rect.bottom > SCR_RECT.height:
                 self.vy = -self.vy
                 self.bounce_counter += 1
-                print(self.bounce_counter)
 
             if self.bounce_counter >= self.option[0]:
                 self.kill()
@@ -222,6 +218,7 @@ class Underheart:
 #            screen.blit(sysfont.render("Now frame is equal"+str(self.frame), False, (255, 255, 255)), (0, 0))
             self.fight_button.draw(screen)
             self.enemy.draw(screen)
+            pygame.draw.line(screen, (255, 255, 255), (self.enemy.x, self.enemy.y+10), (self.enemy.x + self.enemy.health * 5, self.enemy.y+10), 5)
             self.bars.draw(screen)
             self.player.draw(screen)
             return None
