@@ -9,12 +9,13 @@ SCR_RECT = Rect(0, 0, 640, 360)
 pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
 #screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
-sysfont = pygame.font.SysFont(None, 80)
+sysfont = pygame.font.SysFont(None, 40)
 
 pygame.display.set_caption(u"Undertale")
 TITLE, PLAY, CLEAR, GAMEOVER = (0, 1, 2, 3)
 START, FIGHT, FLAG = (0, 1, 2)
 VIS, UNVIS = (1, 0)
+stages = ['None', 'Stage1', 'Stage2']
 
 def load_image(filename, width, height):
    image = pygame.image.load(filename).convert_alpha()
@@ -61,7 +62,7 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.combat, self.rect)
     
 class Enemy:
-    shot_prob = 200 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
+    shot_prob = 10 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
     def __init__(self, filename, width, height, x, y, max_health, type):
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
@@ -81,6 +82,7 @@ class Enemy:
 
         if self.type == 2:
             if not random.randrange(self.shot_prob):
+                new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 2)
                 return None
 
 
@@ -95,8 +97,9 @@ class Barrage(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
-        self.vx = random.randint(1, 10)
-        self.vy = random.randint(1, 10)
+        self.x = x; self.y = y;
+        self.vx = random.randint(-5, 5)
+        self.vy = random.randint(-5, 5)
         self.type = type
         self.option = option
         self.bounce_counter = 0
@@ -126,15 +129,42 @@ class Barrage(pygame.sprite.Sprite):
                 
           # 画面からはみ出ないようにする
             self.rect = self.rect.clamp(SCR_RECT)
+
+        elif self.type == 2:    # type_2: 頂点を出発点、ランダムな傾きを加えた二次関数、式は上に凸だが実際は下に凸として描画される。また左右もランダム
+            a = random.randint(1, 100)
+            self.vy = a * (self.vx - self.x)^2 + self.y
+            self.rect.move_ip(self.vx, self.vy)
+
+
 class Button(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y):
+        pygame.sprite.Sprite.__init__(self, self.containers)
         self.button = load_image(filename, width, height)
+        self.width = width; self.height = height;
         self.rect = Rect(x, y, width, height)
+
+    def update(self):
+
+        self.x = random.randrange(1, 400)
+        self.y = random.randrange(30, 200)
+        self.rect = Rect(self.x, self.y, self.width, self.height)
 
     def draw(self, screen):
         screen.blit(self.button, self.rect)
 
-
+class Explosion(pygame.sprite.Sprite):
+    animcycle = 5
+    frame = 0
+    def __init__(self, pos):
+        self.image = self.image[0]
+        self.rect = self.rect = self.image.get_rect()
+        self.rect.center = pos
+        self.max_frame = len(self.images) * self.animcycle
+    def update(self):
+        self.image = self.images[self.frame/self.animcycle]
+        self.frame += 1
+        if self.frame == self.max_frame:
+            self.kill()
 
 class Underheart:
     def __init__(self):
@@ -143,11 +173,21 @@ class Underheart:
         self.load_bullets()
         self.stage_flag = 0
 
+        self.hit_sound = pygame.mixer.Sound("sounds/bad.wav")
+        self.break_sound = pygame.mixer.Sound("sounds/break.wav")
+
+#        foo = load_image("healthy_heart.png", 10, 10)
+#        bar = load_image("broken_heart.png", 10, 10)
+#        Explosion.images = [foo, bar]
+
         self.title_phrase = load_image("images/title_phrase.png", 400, 40)
+        self.buttons = pygame.sprite.RenderUpdates()
+        Button.containers = self.buttons
         
         self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200)
         self.start_button = Button("images/button_mercy.png", 100, 50, 320, 100)
         self.stage1_button = Button("images/button_stage1.png", 100, 50, 70, 180)
+        self.stage2_button = Button("images/button_stage2.png", 100, 50, 200, 180)
         self.clock = pygame.time.Clock()
 
         while True:
@@ -209,6 +249,8 @@ class Underheart:
             screen.fill((0, 0, 0))
             screen.blit(self.title_phrase, (110, 30))
             self.stage1_button.draw(screen)
+            self.stage2_button.draw(screen)
+            screen.blit(sysfont.render("Selected Stage is "+str(stages[self.stage_flag]), False, (255, 255, 255)), (0, 0))
             self.start_button.draw(screen)
             self.player.draw(screen)
             return None
@@ -241,10 +283,13 @@ class Underheart:
         bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
             self.player_health -= 1 
+            self.hit_sound.play()
             # ダメージを受けるとダンダン自機が小さくなっていく
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
             # プレイヤーの体力がなくなったらゲームオーバー
             if self.player_health < 0:
+                self.break_sound.play()
+#                Explosion(self.player.rect.center)
                 self.game_status = GAMEOVER
 
     def collisionOfButton(self, button, act, flag = None):
@@ -253,14 +298,18 @@ class Underheart:
             if act == FLAG:
                 if flag == 1:
                     self.stage_flag = 1
-                self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 14, self.stage_flag)
+
+                if flag == 2:
+                    self.stage_flag = 2
+
+                self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 30, self.stage_flag)
 
             if act == START:
                 self.game_status = PLAY
             if act == FIGHT:
                 self.enemy.health -= 1
-            
-
+                self.fight_button.update()
+                        
     def key_handler(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -275,6 +324,7 @@ class Underheart:
                 if self.game_status == TITLE:
                     if event.key == K_z:
                         self.collisionOfButton(self.stage1_button, FLAG, 1) 
+                        self.collisionOfButton(self.stage2_button, FLAG, 2) 
                         if self.stage_flag != 0:
                             self.collisionOfButton(self.start_button, START)
                         
