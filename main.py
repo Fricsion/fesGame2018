@@ -114,6 +114,9 @@ class Undertale:
     def __init__(self):
         self.game_status = TITLE 
         self.game_init()
+        self.load_bullets()
+
+        self.title_phrase = load_image("images/title_phrase.png", 400, 40)
         
         self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200)
         self.start_button = Button("images/button_mercy.png", 100, 50, 320, 180)
@@ -132,19 +135,27 @@ class Undertale:
 
     def game_init(self):
 
+        self.frame = 0 # ゲームスタート時にカウントを始めゲーム内時間を計算（ゲーム起動時ではない）
         self.player_health = 2
-        self.player_scale = [10, 15, 20]
+        self.player_scale = [10, 15, 20] # プレイヤーの体力に応じた大きさの設定
         self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
-
 
         self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 14)
 
-        bullet_list = [0, 0, 1, 1, 1]
+    def load_bullets(self):
+
+        bullet_list = [[0, 5000], [0, 7000], [1, 9000], [1, 11000],  [1, 13000]]
 
         self.bars = pygame.sprite.RenderUpdates()
         Barrage.containers = self.bars
-        for type in bullet_list:
-            new = Barrage("images/asteroid1.png", self.enemy.x, self.enemy.y, 5, 5, 30, 30, type)
+#        for type in bullet_list:
+#            new = Barrage("images/asteroid1.png", self.enemy.x, self.enemy.y, 5, 5, 30, 30, type)
+#            bullet = {}
+#            bullet["type"] = bullet_list[0]
+#            bullet["time"] = bullet_list[1]
+#            bullet["visible"] = False
+
+
 
     def update(self):
         if self.game_status == TITLE:
@@ -152,10 +163,13 @@ class Undertale:
             return None
 
         elif self.game_status == PLAY:
+            self.frame += self.clock.get_time()
+
             self.player.move()
             self.enemy.move()
             self.bars.update()
             self.collisionOfBullet()
+            # 敵の体力がなくなったらクリア画面へ
             if self.enemy.health < 0:
                 pygame.time.delay(10)
                 self.game_status = CLEAR
@@ -172,12 +186,14 @@ class Undertale:
     def draw(self, screen):
         if self.game_status == TITLE:
             screen.fill((0, 0, 0))
+            screen.blit(self.title_phrase, (110, 30))
             self.start_button.draw(screen)
             self.player.draw(screen)
             return None
 
         elif self.game_status == PLAY:
             screen.fill((0, 0, 0))
+            screen.blit(sysfont.render("Now frame is equal"+str(self.frame), False, (255, 255, 255)), (0, 0))
             self.fight_button.draw(screen)
             self.enemy.draw(screen)
             self.bars.draw(screen)
@@ -192,11 +208,19 @@ class Undertale:
             screen.fill((100, 100, 100))
             return None
 
+    def over_anime(self):
+        
+       # mes = "Except Your Dead.\nIf you refuse to die, press Z"
+        
+        return None
+        
     def collisionOfBullet(self):
         bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
             self.player_health -= 1 
+            # ダメージを受けるとダンダン自機が小さくなっていく
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
+            # プレイヤーの体力がなくなったらゲームオーバー
             if self.player_health < 0:
                 self.game_status = GAMEOVER
 
