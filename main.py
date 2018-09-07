@@ -82,6 +82,10 @@ class Enemy:
             if not random.randrange(self.shot_prob):
                 new = Barrage("images/asteroid1.png", self.x, self.y, 30, 30, 15, 15, 1, [5])
 
+        if self.type == 2:
+            if not random.randrange(self.shot_prob):
+                return None
+
 
     def draw(self, screen):
         screen.blit(self.enemy, self.rect)
@@ -136,7 +140,7 @@ class Button(pygame.sprite.Sprite):
 
 
 
-class Undertale:
+class Underheart:
     def __init__(self):
         self.game_status = TITLE 
         self.game_init()
@@ -146,7 +150,7 @@ class Undertale:
         self.title_phrase = load_image("images/title_phrase.png", 400, 40)
         
         self.fight_button = Button("images/button_fight.png", 100, 50, 200, 200)
-        self.start_button = Button("images/button_mercy.png", 100, 50, 320, 180)
+        self.start_button = Button("images/button_mercy.png", 100, 50, 320, 100)
         self.stage1_button = Button("images/button_stage1.png", 100, 50, 70, 180)
         self.clock = pygame.time.Clock()
 
@@ -172,8 +176,8 @@ class Undertale:
 
     def load_bullets(self):
 
-        self.bullet_list = [[0, 5000, UNVIS], [0, 7000, UNVIS], [1, 9000, UNVIS], [1, 11000, UNVIS],  [1, 13000, UNVIS]]
-        self.bullets = [3000, 9000, 15000, 20000]
+#        self.bullet_list = [[0, 5000, UNVIS], [0, 7000, UNVIS], [1, 9000, UNVIS], [1, 11000, UNVIS],  [1, 13000, UNVIS]]
+#        self.bullets = [3000, 9000, 15000, 20000]
 
         self.bars = pygame.sprite.RenderUpdates()
         Barrage.containers = self.bars
@@ -274,7 +278,8 @@ class Undertale:
                 if self.game_status == TITLE:
                     if event.key == K_z:
                         self.collisionOfButton(self.stage1_button, FLAG, 1) 
-                        self.collisionOfButton(self.start_button, START)
+                        if self.stage_flag != 0:
+                            self.collisionOfButton(self.start_button, START)
                         
 
                 elif self.game_status == PLAY:
@@ -287,4 +292,4 @@ class Undertale:
                         self.game_init()
 
 if __name__ == "__main__":
-    myGame = Undertale()
+    myGame = Underheart()
