@@ -12,7 +12,7 @@ screen = pygame.display.set_mode(SCR_RECT.size)
 sysfont = pygame.font.SysFont(None, 80)
 
 pygame.display.set_caption(u"Undertale")
-TITLE, PLAY, GAMEOVER = (0, 1, 2)
+TITLE, PLAY, CLEAR, GAMEOVER = (0, 1, 2, 3)
 START, FIGHT = (0, 1)
 
 def load_image(filename, width, height):
@@ -56,10 +56,10 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.combat, self.rect)
     
 class Enemy:
-    def __init__(self, filename, width, height, x, y):
+    def __init__(self, filename, width, height, x, y, max_health):
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
-        self.health = 14
+        self.health = max_health 
         self.x = x
         self.y = y
 
@@ -133,7 +133,7 @@ class Undertale:
         self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
 
 
-        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100)
+        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100, 14)
 
         bullet_list = [0, 0, 1, 1, 1]
 
@@ -151,6 +151,10 @@ class Undertale:
             self.player.move()
             self.bars.update()
             self.collisionOfBullet()
+            if self.enemy.health < 0:
+                pygame.time.delay(10)
+                self.game_status = CLEAR
+
             return None
 
         elif self.game_status == GAMEOVER:
