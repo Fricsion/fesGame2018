@@ -63,6 +63,18 @@ class Enemy:
         self.x = x
         self.y = y
 
+    def move(self):
+        if self.rect.y <= 30:
+            self.rect.move_ip(0, 1)
+        if self.rect.y >= 30:
+
+            bullet_list = [0, 0, 1, 1, 1]
+    
+            self.bars = pygame.sprite.RenderUpdates()
+            Barrage.containers = self.bars
+            for type in bullet_list:
+                new = Barrage("images/asteroid1.png", self.x, self.y, 5, 5, 30, 30, type)
+
     def draw(self, screen):
         screen.blit(self.enemy, self.rect)
 
@@ -72,8 +84,8 @@ class Barrage(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
-        self.vx = random.randint(1, 2)
-        self.vy = random.randint(1, 2)
+        self.vx = random.randint(1, 10)
+        self.vy = random.randint(1, 10)
         self.type = type
         self.radius = width/3   # 円の当たり判定で使うゾ
     
@@ -133,14 +145,14 @@ class Undertale:
         self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
 
 
-        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, 100, 14)
+        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -10, 14)
 
-        bullet_list = [0, 0, 1, 1, 1]
-
-        self.bars = pygame.sprite.RenderUpdates()
-        Barrage.containers = self.bars
-        for type in bullet_list:
-            new = Barrage("images/asteroid1.png", self.enemy.x, self.enemy.y, 5, 5, 30, 30, type)
+#        bullet_list = [0, 0, 1, 1, 1]
+#
+#        self.bars = pygame.sprite.RenderUpdates()
+#        Barrage.containers = self.bars
+#        for type in bullet_list:
+#            new = Barrage("images/asteroid1.png", self.enemy.x, self.enemy.y, 5, 5, 30, 30, type)
 
     def update(self):
         if self.game_status == TITLE:
@@ -149,12 +161,16 @@ class Undertale:
 
         elif self.game_status == PLAY:
             self.player.move()
-            self.bars.update()
+            self.enemy.move()
+            self.enemy.bars.update()
             self.collisionOfBullet()
             if self.enemy.health < 0:
                 pygame.time.delay(10)
                 self.game_status = CLEAR
 
+            return None
+
+        elif self.game_status == CLEAR:
             return None
 
         elif self.game_status == GAMEOVER:
@@ -172,8 +188,12 @@ class Undertale:
             screen.fill((0, 0, 0))
             self.fight_button.draw(screen)
             self.enemy.draw(screen)
-            self.bars.draw(screen)
+            self.enemy.bars.draw(screen)
             self.player.draw(screen)
+            return None
+
+        if self.game_status == CLEAR:
+            screen.fill((200, 200, 200))
             return None
 
         if self.game_status == GAMEOVER:
@@ -181,7 +201,7 @@ class Undertale:
             return None
 
     def collisionOfBullet(self):
-        bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
+        bullet_col = pygame.sprite.spritecollide(self.player, self.enemy.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
             self.player_health -= 1 
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
@@ -214,7 +234,7 @@ class Undertale:
                 elif self.game_status == PLAY:
                     if event.key == K_z:
                         self.collisionOfButton(self.fight_button, FIGHT)
-                elif self.game_status == GAMEOVER:
+                elif self.game_status == GAMEOVER or self.game_status == CLEAR:
                     if event.key == K_z:
                         self.game_status = TITLE 
                         self.game_init()
