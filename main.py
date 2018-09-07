@@ -14,11 +14,16 @@ sysfont = pygame.font.SysFont(None, 80)
 pygame.display.set_caption(u"Undertale")
 TITLE, PLAY, CLEAR, GAMEOVER = (0, 1, 2, 3)
 START, FIGHT = (0, 1)
+VIS, UNVIS = (1, 0)
 
 def load_image(filename, width, height):
    image = pygame.image.load(filename).convert_alpha()
    image = pygame.transform.scale(image, (width, height))
    return image
+
+def simplize(number):
+    answer = round(number, -3)
+    return answer
  
 class Player(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y):
@@ -56,16 +61,25 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.combat, self.rect)
     
 class Enemy:
+    shot_prob = 200 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
     def __init__(self, filename, width, height, x, y, max_health):
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
         self.health = max_health 
         self.x = x
         self.y = y
+        
 
-    def move(self):
+    def update(self):
         if self.rect.y <= 30:
             self.rect.move_ip(0, 1)
+
+#        shot_orNot = random.randrange(300)
+#        if shot_orNot == 1:
+#            new = Barrage("images/asteroid1.png", self.x, self.y, 30, 30, 5, 5, 1)
+        if not random.randrange(self.shot_prob):
+            new = Barrage("images/asteroid1.png", self.x, self.y, 30, 30, 15, 15, 1)
+
 
     def draw(self, screen):
         screen.blit(self.enemy, self.rect)
@@ -144,17 +158,11 @@ class Undertale:
 
     def load_bullets(self):
 
-        bullet_list = [[0, 5000], [0, 7000], [1, 9000], [1, 11000],  [1, 13000]]
+        self.bullet_list = [[0, 5000, UNVIS], [0, 7000, UNVIS], [1, 9000, UNVIS], [1, 11000, UNVIS],  [1, 13000, UNVIS]]
+        self.bullets = [3000, 9000, 15000, 20000]
 
         self.bars = pygame.sprite.RenderUpdates()
         Barrage.containers = self.bars
-#        for type in bullet_list:
-#            new = Barrage("images/asteroid1.png", self.enemy.x, self.enemy.y, 5, 5, 30, 30, type)
-#            bullet = {}
-#            bullet["type"] = bullet_list[0]
-#            bullet["time"] = bullet_list[1]
-#            bullet["visible"] = False
-
 
 
     def update(self):
@@ -164,9 +172,8 @@ class Undertale:
 
         elif self.game_status == PLAY:
             self.frame += self.clock.get_time()
-
             self.player.move()
-            self.enemy.move()
+            self.enemy.update()
             self.bars.update()
             self.collisionOfBullet()
             # 敵の体力がなくなったらクリア画面へ
@@ -252,6 +259,7 @@ class Undertale:
                         self.collisionOfButton(self.fight_button, FIGHT)
                 elif self.game_status == GAMEOVER or self.game_status == CLEAR:
                     if event.key == K_z:
+                        self.bars.empty()
                         self.game_status = TITLE 
                         self.game_init()
 
