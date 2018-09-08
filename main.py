@@ -8,7 +8,7 @@ import random
 SCR_RECT = Rect(0, 0, 640, 360) 
 pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
-#screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
+screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
 sysfont = pygame.font.SysFont(None, 40)
 
 pygame.display.set_caption(u"Undertale")
@@ -61,35 +61,39 @@ class Player(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
     
-class Enemy:
-    shot_prob = 100 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
+class Enemy(pygame.sprite.Sprite):
+    shot_prob = 10 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
     def __init__(self, filename, width, height, x, y, max_health, type):
+        super().__init__()
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
         self.health = max_health 
         self.x = x
         self.y = y
-        self.type = type
-        
+        self.type = type 
 
     def update(self):
+       
         if self.rect.y <= 30:
             self.rect.move_ip(0, 1)
 
-        if self.type == 1:
-            if not random.randrange(self.shot_prob):
-                new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
-
-        if self.type == 2:
-            if not random.randrange(self.shot_prob):
-                new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 2)
-                return None
+        elif self.rect.y >= 30:
+            if self.type == 1:
+                shot_prob = 100
+                if not random.randrange(shot_prob):
+                    new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
+    
+            if self.type == 2:
+                shot_prob = 10
+                if not random.randrange(shot_prob):
+                    new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
+                    return None
 
 
     def draw(self, screen):
         screen.blit(self.enemy, self.rect)
         
-        pygame.draw.line(screen, (90, 140, 40), (self.rect.x, self.rect.y-10), (self.rect.x + self.health * 15, self.rect.y-10), 5)
+        pygame.draw.line(screen, (90, 140, 40), (self.rect.x, self.rect.y-10), (self.rect.x + self.health * 10, self.rect.y-10), 5)
 
 class Barrage(pygame.sprite.Sprite):
     def __init__(self, filename, x, y, vx, vy, width, height, type, option = None):
@@ -98,8 +102,8 @@ class Barrage(pygame.sprite.Sprite):
         self.image = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
         self.x = x; self.y = y;
-        self.vx = random.randint(-5, 5)
-        self.vy = random.randint(-5, 5)
+        self.vx = random.randrange(-3, 3) 
+        self.vy = random.randrange(-3, 3)
         self.type = type
         self.option = option
         self.bounce_counter = 0
@@ -210,7 +214,7 @@ class Underheart:
         self.player_scale = [10, 15, 20] # プレイヤーの体力に応じた大きさの設定
         self.player = Player("images/heart.png", self.player_scale[self.player_health], self.player_scale[self.player_health], 320, 180)
 
-#        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 14)
+        self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 10, 0)
 
     def load_bullets(self):
 
@@ -268,9 +272,8 @@ class Underheart:
 
         elif self.game_status == CLEAR:
             screen.fill((200, 200, 200))
-            screen.blit(sysfont.render("Now frame is equal"+str(self.frame), False, (255, 255, 255)), (0, 0))
-            screen.blit(sysfont.render("Press Z to back to menu", False, (255, 255, 255)), (100, 100))
-
+            score = self.frame * self.player_health
+            screen.blit(sysfont.render("YOUR SCORE =>"+str(score), False, (255, 255, 255)), (0, 0))
             return None
 
         elif self.game_status == GAMEOVER:
