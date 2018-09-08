@@ -178,6 +178,7 @@ class Underheart:
         self.game_init()
         self.load_bullets()
         self.stage_flag = 0
+        self.fullscreen_flag = False
 
         self.hit_sound = pygame.mixer.Sound("sounds/bad.wav")
         self.break_sound = pygame.mixer.Sound("sounds/break.wav")
@@ -335,6 +336,12 @@ class Underheart:
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+                if event.key == K_F2:
+                    self.fullscreen_flag = not self.fullscreen_flag
+                    if self.fullscreen_flag:
+                        screen = pygame.display.set_mode(SCR_RECT.size, FULLSCREEN, 32)
+                    else:
+                        screen = pygame.display.set_mode(SCR_RECT.size, 0, 32)
                 
                 if self.game_status == TITLE:
                     if event.key == K_z:
