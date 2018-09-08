@@ -8,13 +8,14 @@ import random
 SCR_RECT = Rect(0, 0, 640, 360) 
 pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
-screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
+#screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
 sysfont = pygame.font.SysFont(None, 40)
 
 pygame.display.set_caption(u"Undertale")
 TITLE, PLAY, CLEAR, GAMEOVER = (0, 1, 2, 3)
 START, FIGHT, FLAG = (0, 1, 2)
 VIS, UNVIS = (1, 0)
+TOUCHABLE, UNTOUCHABLE = (1, 0)
 stages = ['None', 'Stage1', 'Stage2']
 
 def load_image(filename, width, height):
@@ -32,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.combat = load_image(filename, width, height)
         width = self.combat.get_width()
         height = self.combat.get_height()
+        self.status = TOUCHABLE
         self.speed = 5
         self.rect = Rect(x, y, width, height)
         self.radius = width/3 # 円の当たり判定で使うゾ
@@ -64,7 +66,7 @@ class Player(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     shot_prob = 10 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
     def __init__(self, filename, width, height, x, y, max_health, type):
-        super().__init__()
+        pygame.sprite.Sprite.__init__(self)
         self.enemy = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
         self.health = max_health 
@@ -159,7 +161,7 @@ class Explosion(pygame.sprite.Sprite):
     animcycle = 5
     frame = 0
     def __init__(self, pos):
-        self.image = self.image[0]
+        self.image = self.images[0]
         self.rect = self.rect = self.image.get_rect()
         self.rect.center = pos
         self.max_frame = len(self.images) * self.animcycle
@@ -171,6 +173,7 @@ class Explosion(pygame.sprite.Sprite):
 
 class Underheart:
     def __init__(self):
+        Explosion.images = [load_image("images/healthy_heart.png", 10, 10), load_image("images/broken_heart.png", 10, 10)]
         self.game_status = TITLE 
         self.game_init()
         self.load_bullets()
@@ -273,19 +276,20 @@ class Underheart:
         elif self.game_status == CLEAR:
             screen.fill((200, 200, 200))
             score = self.frame * self.player_health
-            screen.blit(sysfont.render("YOUR SCORE =>"+str(score), False, (255, 255, 255)), (0, 0))
+            screen.blit(sysfont.render("YOUR SCORE : "+str(score), False, (255, 255, 255)), (0, 0))
             return None
 
         elif self.game_status == GAMEOVER:
             screen.fill((100, 100, 100))
+            #self.over_anime()
             return None
 
-    def over_anime(self):
-        
-       # mes = "Except Your Dead.\nIf you refuse to die, press Z"
-        
-        return None
-        
+    def over_anime(self):   #未実装
+        message = "Except Your Dead.\nIf you refuse to die, press Z"
+        charactors = message.split(' ')
+        for i in range(len(charactors)):
+            screen.blit(sysfont.render(charactors[0, i], False, (255, 255, 255)), (0, 0))
+         
     def collisionOfBullet(self):
         bullet_col = pygame.sprite.spritecollide(self.player, self.bars, True, pygame.sprite.collide_circle)
         if bullet_col:
@@ -296,7 +300,8 @@ class Underheart:
             # プレイヤーの体力がなくなったらゲームオーバー
             if self.player_health < 0:
                 self.break_sound.play()
-#                Explosion(self.player.rect.center)
+                Explosion(self.player.rect.center)
+                pygame.time.wait(1000)
                 self.game_status = GAMEOVER
 
     def collisionOfButton(self, button, act, flag = None):
