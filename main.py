@@ -278,6 +278,8 @@ class Underheart:
 
         elif self.game_status == GAMEOVER:
             screen.fill((0, 0, 0))
+            screen.blit(sysfont.render("Except Your Dead. If you refuse to die, press Z", False, (255, 255, 255)), (0, 0))
+
             return None
 
     def over_anime(self):   #未実装
