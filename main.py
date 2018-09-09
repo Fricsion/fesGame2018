@@ -59,8 +59,7 @@ class Player(pygame.sprite.Sprite):
             if pressed_key[K_DOWN]:
                 self.rect.move_ip(0, self.speed)
         self.rect = self.rect.clamp(SCR_RECT)
-        self.radius = self.rect.width/2
-        print(self.radius)
+        self.radius = self.rect.width/3
 
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
@@ -188,10 +187,6 @@ class Underheart:
         self.enter_sound = pygame.mixer.Sound("sounds/enter.wav")
         self.attack_sound = pygame.mixer.Sound("sounds/attack.wav")
 
-#        foo = load_image("healthy_heart.png", 10, 10)
-#        bar = load_image("broken_heart.png", 10, 10)
-#        Explosion.images = [foo, bar]
-
         self.title_phrase = load_image("images/title_phrase.png", 400, 40)
         self.buttons = pygame.sprite.RenderUpdates()
         Button.containers = self.buttons
@@ -302,7 +297,7 @@ class Underheart:
             self.hit_sound.play()
             # ダメージを受けるとダンダン自機が小さくなっていく
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
-            self.player.rect = (0, 0, self.player_scale[self.player_health], self.player_scale[self.player_health])
+            self.player.rect = Rect(self.player.rect.x, self.player.rect.y, self.player_scale[self.player_health], self.player_scale[self.player_health])
             # プレイヤーの体力がなくなったらゲームオーバー
             if self.player_health < 0:
                 self.break_sound.play()
