@@ -67,7 +67,6 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.combat, self.rect)
     
 class Enemy(pygame.sprite.Sprite):
-    shot_prob = 10 # 球発車の乱数ジェネレート。当たり前だが小さいほど頻度が上がる
     def __init__(self, filename, width, height, x, y, max_health, type):
         pygame.sprite.Sprite.__init__(self)
         self.enemy = load_image(filename, width, height)
@@ -84,7 +83,7 @@ class Enemy(pygame.sprite.Sprite):
 
         elif self.rect.y >= 30:
             if self.type == 1:
-                shot_prob = 90
+                shot_prob = 90 # 弾射出頻度（当たり前だが小さくなるほど頻度が上がる）
                 if not random.randrange(shot_prob):
                     new = Barrage("images/white_bullet.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
     
