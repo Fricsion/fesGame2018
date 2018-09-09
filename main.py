@@ -86,12 +86,12 @@ class Enemy(pygame.sprite.Sprite):
             if self.type == 1:
                 shot_prob = 90
                 if not random.randrange(shot_prob):
-                    new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
+                    new = Barrage("images/white_bullet.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
     
             if self.type == 2:
                 shot_prob = 20 
                 if not random.randrange(shot_prob):
-                    new = Barrage("images/asteroid1.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
+                    new = Barrage("images/white_bullet.png", self.rect.x, self.rect.y, 30, 30, 15, 15, 1, [5])
 
 
     def draw(self, screen):
