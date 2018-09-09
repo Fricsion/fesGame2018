@@ -8,8 +8,10 @@ import random
 SCR_RECT = Rect(0, 0, 640, 360) 
 pygame.init()
 screen = pygame.display.set_mode(SCR_RECT.size)
-#screen = pygame.display.set_mode(SCR_RECT.size, DOUBLEBUF|HWSURFACE|FULLSCREEN)
 sysfont = pygame.font.SysFont(None, 40)
+
+scores = {"stage1":[],
+        "stage2":[]}
 
 pygame.display.set_caption(u"Undertale")
 TITLE, PLAY, CLEAR, GAMEOVER = (0, 1, 2, 3)
@@ -104,8 +106,8 @@ class Barrage(pygame.sprite.Sprite):
         self.image = load_image(filename, width, height)
         self.rect = Rect(x, y, width, height)
         self.x = x; self.y = y;
-        self.vx = random.randrange(-3, 3) 
-        self.vy = random.randrange(-3, 3)
+        self.vx = random.randrange(-2, 2) 
+        self.vy = random.randrange(-2, 2)
         self.type = type
         self.option = option
         self.bounce_counter = 0
@@ -219,10 +221,6 @@ class Underheart:
         self.stage_flag = 0
 
     def load_bullets(self):
-
-#        self.bullet_list = [[0, 5000, UNVIS], [0, 7000, UNVIS], [1, 9000, UNVIS], [1, 11000, UNVIS],  [1, 13000, UNVIS]]
-#        self.bullets = [3000, 9000, 15000, 20000]
-
         self.bars = pygame.sprite.RenderUpdates()
         Barrage.containers = self.bars
 
@@ -273,19 +271,18 @@ class Underheart:
             return None
 
         elif self.game_status == CLEAR:
-            screen.fill((200, 200, 200))
+            screen.fill((0, 0, 0))
             score = self.frame * self.player_health
             screen.blit(sysfont.render("YOUR SCORE : "+str(score), False, (255, 255, 255)), (0, 0))
             return None
 
         elif self.game_status == GAMEOVER:
-            screen.fill((100, 100, 100))
-            #self.over_anime()
+            screen.fill((0, 0, 0))
             return None
 
     def over_anime(self):   #未実装
         message = "Except Your Dead.\nIf you refuse to die, press Z"
-        charactors = message.split(' ')
+        charactors = list(message)
         for i in range(len(charactors)):
             screen.blit(sysfont.render(charactors[0, i], False, (255, 255, 255)), (0, 0))
          
@@ -301,6 +298,7 @@ class Underheart:
             if self.player_health < 0:
                 self.break_sound.play()
                 #Explosion(self.player.rect.center)
+                #self.over_anime()
                 pygame.time.wait(1000)
                 self.game_status = GAMEOVER
 
