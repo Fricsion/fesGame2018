@@ -159,19 +159,19 @@ class Button(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.button, self.rect)
 
-class Explosion(pygame.sprite.Sprite):
-    animcycle = 5
-    frame = 0
-    def __init__(self, pos):
-        self.image = self.images[0]
-        self.rect = self.rect = self.image.get_rect()
-        self.rect.center = pos
-        self.max_frame = len(self.images) * self.animcycle
-    def update(self):
-        self.image = self.images[self.frame/self.animcycle]
-        self.frame += 1
-        if self.frame == self.max_frame:
-            self.kill()
+#class Explosion(pygame.sprite.Sprite):
+#    animcycle = 5
+#    frame = 0
+#    def __init__(self, pos):
+#        self.image = self.images[0]
+#        self.rect = self.rect = self.image.get_rect()
+#        self.rect.center = pos
+#        self.max_frame = len(self.images) * self.animcycle
+#    def update(self):
+#        self.image = self.images[self.frame/self.animcycle]
+#        self.frame += 1
+#        if self.frame == self.max_frame:
+#            self.kill()
 
 class Underheart:
     def __init__(self):
@@ -306,7 +306,7 @@ class Underheart:
             # プレイヤーの体力がなくなったらゲームオーバー
             if self.player_health < 0:
                 self.break_sound.play()
-                Explosion(self.player.rect.center)
+                #Explosion(self.player.rect.center)
                 pygame.time.wait(1000)
                 self.game_status = GAMEOVER
 
