@@ -20,16 +20,18 @@ VIS, UNVIS = (1, 0)
 TOUCHABLE, UNTOUCHABLE = (1, 0)
 stages = ['None', 'Stage1', 'Stage2']
 
-def load_image(filename, width, height):
+def load_image(filename, width, height):    # 画像読み込み{{{
    image = pygame.image.load(filename).convert_alpha()
    image = pygame.transform.scale(image, (width, height))
    return image
+#}}}
 
-def simplize(number):
+def simplize(number):   #４桁の数字を千の位で四捨五入{{{
     answer = round(number, -3)
     return answer
+#}}}
  
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite): #プレイヤー（操作）スプライト{{{
     def __init__(self, filename, width, height, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.combat = load_image(filename, width, height)
@@ -65,6 +67,7 @@ class Player(pygame.sprite.Sprite):
 
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
+#}}}
     
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, filename, width, height, x, y, max_health, type):
@@ -248,7 +251,6 @@ class Underheart:
         elif self.game_status == GAMEOVER:
             return None
 
-
     def draw(self, screen):
         if self.game_status == TITLE:
             screen.fill((0, 0, 0))
@@ -314,7 +316,7 @@ class Underheart:
                 if flag == 2:
                     self.stage_flag = 2
 
-                self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 30, self.stage_flag)
+                self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 10, self.stage_flag)
 
             if act == START:
                 self.enter_sound.play()
@@ -361,3 +363,4 @@ class Underheart:
 
 if __name__ == "__main__":
     myGame = Underheart()
+# vim: set foldmethod=marker :
