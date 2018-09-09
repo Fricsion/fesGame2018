@@ -175,7 +175,7 @@ class Button(pygame.sprite.Sprite):
 
 class Underheart:
     def __init__(self):
-        Explosion.images = [load_image("images/healthy_heart.png", 10, 10), load_image("images/broken_heart.png", 10, 10)]
+        #Explosion.images = [load_image("images/healthy_heart.png", 10, 10), load_image("images/broken_heart.png", 10, 10)]
         self.game_status = TITLE 
         self.game_init()
         self.load_bullets()
