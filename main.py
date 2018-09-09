@@ -34,7 +34,7 @@ class Player(pygame.sprite.Sprite):
         width = self.combat.get_width()
         height = self.combat.get_height()
         self.status = TOUCHABLE
-        self.speed = 5
+        self.speed = 3
         self.rect = Rect(x, y, width, height)
         self.radius = width/3 # 円の当たり判定で使うゾ
 
@@ -59,6 +59,8 @@ class Player(pygame.sprite.Sprite):
             if pressed_key[K_DOWN]:
                 self.rect.move_ip(0, self.speed)
         self.rect = self.rect.clamp(SCR_RECT)
+        self.radius = self.rect.width/2
+        print(self.radius)
 
     def draw(self, screen):
         screen.blit(self.combat, self.rect)
@@ -220,6 +222,8 @@ class Underheart:
 
         self.enemy = Enemy("images/spaceship.png", 50, 50, 320, -100, 10, 0)
 
+        self.stage_flag = 0
+
     def load_bullets(self):
 
 #        self.bullet_list = [[0, 5000, UNVIS], [0, 7000, UNVIS], [1, 9000, UNVIS], [1, 11000, UNVIS],  [1, 13000, UNVIS]]
@@ -298,6 +302,7 @@ class Underheart:
             self.hit_sound.play()
             # ダメージを受けるとダンダン自機が小さくなっていく
             self.player.combat = pygame.transform.scale(self.player.combat, (self.player_scale[self.player_health], self.player_scale[self.player_health]))
+            self.player.rect = (0, 0, self.player_scale[self.player_health], self.player_scale[self.player_health])
             # プレイヤーの体力がなくなったらゲームオーバー
             if self.player_health < 0:
                 self.break_sound.play()
